@@ -309,6 +309,12 @@ with tabs[1]:
     col_l, col_r = st.columns(2)
 
     with col_l:
+        with st.expander("ℹ️ Help — WTP Score Distribution by Room Type"):
+            st.markdown("""
+- **Bars**: Histogram of WTP scores; each color is a room type (overlaid).
+- **Red dashed line**: Overall mean WTP score across all bookings.
+- Use this to see how WTP varies by room type and where most scores sit.
+            """.strip())
         fig = px.histogram(
             fdf, x="WTP_Score", color="Room_Type",
             nbins=40, barmode="overlay", opacity=0.72,
@@ -322,6 +328,12 @@ with tabs[1]:
         st.plotly_chart(fig, use_container_width=True)
 
     with col_r:
+        with st.expander("ℹ️ Help — Booked Rate Distribution by Rate Plan"):
+            st.markdown("""
+- **Bars**: Histogram of booked rates (prices); each color is a rate plan base (overlaid).
+- Shows how much guests actually paid, split by rate plan (e.g. BAR, Promo).
+- Use this to compare rate levels and concentration across plans.
+            """.strip())
         fig = px.histogram(
             fdf, x="Booked_Rate", color="Rate_Plan_Base",
             nbins=50, barmode="overlay", opacity=0.72,
@@ -333,6 +345,12 @@ with tabs[1]:
 
     st.subheader("WTP Comparison Across Segments")
 
+    with st.expander("ℹ️ Help — WTP Comparison Across Segments"):
+        st.markdown("""
+- **Segment dimension**: Choose how to group bookings (channel, room type, rate plan, booking window, or member status).
+- **Metric**: Compare either WTP Score or Booked Rate across those segments.
+- **Box plot**: Each box shows median, quartiles, and range; points are outliers. Use this to compare levels and spread across segments.
+        """.strip())
     c1, c2 = st.columns(2)
     with c1:
         seg_dim = st.selectbox(
@@ -357,6 +375,12 @@ with tabs[1]:
 
     # Heatmap
     st.subheader("WTP Heatmap")
+    with st.expander("ℹ️ Help — WTP Heatmap"):
+        st.markdown("""
+- **X axis / Y axis**: Pick two dimensions to cross-tabulate (e.g. Room Type vs Booking Channel).
+- **Cells**: Each cell is the average WTP score for that combination; darker blue = higher WTP.
+- Use this to spot which segment combinations have the highest or lowest willingness to pay.
+        """.strip())
     c1, c2 = st.columns(2)
     with c1:
         heat_x = st.selectbox("X axis", ["Booking_Channel", "Room_Type", "Window_Segment"], key="hx")
