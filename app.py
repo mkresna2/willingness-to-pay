@@ -25,10 +25,7 @@ BLUES = ["#1A3A5C", "#2471A3", "#5DADE2", "#AED6F1", "#D6EAF8"]
 QUAL  = px.colors.qualitative.Set2
 
 # ── Load & Engineer Features ─────────────────────────────────────────────────────
-@st.cache_data
-def load_data(path: str = "data/Bookings.csv") -> pd.DataFrame:
-    df = pd.read_csv(path)
-
+def _engineer_data(df: pd.DataFrame) -> pd.DataFrame:
     for col in ["Booking_Date", "Check_in_Date", "Check_out_Date"]:
         df[col] = pd.to_datetime(df[col])
 
@@ -100,14 +97,48 @@ def load_data(path: str = "data/Bookings.csv") -> pd.DataFrame:
     return df
 
 
-df = load_data()
+@st.cache_data
+def load_data(path: str = "data/Bookings.csv") -> pd.DataFrame:
+    df = pd.read_csv(path)
+    return _engineer_data(df)
 
-# ── Sidebar ──────────────────────────────────────────────────────────────────────
+
+def load_data_from_upload(uploaded_file) -> pd.DataFrame:
+    df = pd.read_csv(uploaded_file)
+    return _engineer_data(df)
+
+
+# ── Sidebar (upload section) ──────────────────────────────────────────────────────
 with st.sidebar:
     st.title("🏨 Hotel RM")
     st.subheader("WTP Segmentation")
     st.markdown("---")
 
+    with st.expander("📤 Upload Data"):
+        uploaded_file = st.file_uploader(
+            "Upload booking data (CSV)",
+            type=["csv"],
+            help="Upload your own booking CSV. If no file is uploaded, sample data is used.",
+        )
+        with st.expander("Expected CSV format"):
+            st.markdown("""
+**Required columns:**
+- `Booking_ID`, `Booking_Date`, `Check_in_Date`, `Check_out_Date`
+- `Room_Type`, `Rate_Plan`, `Booked_Rate`, `Number_of_Nights`, `Number_of_Guests`
+- `Booking_Channel`, `Cancellation_Status`, `Revenue_Generated`
+
+**Date format:** YYYY-MM-DD  
+**Cancellation_Status:** e.g. `Confirmed`, `Cancelled`  
+**Rate_Plan:** May include ` + Member` suffix (e.g. `BAR + Member`).
+            """.strip())
+
+    st.markdown("---")
+
+# ── Resolve data source ──────────────────────────────────────────────────────────
+df = load_data_from_upload(uploaded_file) if uploaded_file else load_data()
+
+# ── Sidebar (filters) ────────────────────────────────────────────────────────────
+with st.sidebar:
     min_ci = df["Check_in_Date"].min().date()
     max_ci = df["Check_in_Date"].max().date()
     date_range = st.date_input(
