@@ -278,6 +278,12 @@ with tabs[0]:
         st.plotly_chart(fig, use_container_width=True)
 
     with col_r2:
+        with st.expander("ℹ️ Help — Revenue by Room Type"):
+            st.markdown("""
+- **Revenue**: Total revenue from confirmed bookings only, grouped by room type.
+- **Bar color (Avg WTP)**: Average willingness-to-pay score for that room type; darker blue = higher WTP.
+- **Labels**: Number of confirmed bookings (e.g. \"1,234 bkgs\") shown on each bar.
+            """.strip())
         rt_rev = (
             confirmed.groupby("Room_Type")
             .agg(Revenue=("Revenue_Generated", "sum"),
