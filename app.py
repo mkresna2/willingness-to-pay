@@ -572,6 +572,16 @@ with tabs[3]:
         col_el, col_pca = st.columns(2)
 
         with col_el:
+            with st.expander("ℹ️ Help — Elbow Method"):
+                st.markdown("""
+**What is this for?**  
+Choosing how many customer segments (clusters) to use — not too few, not too many.
+
+**How to read it:**
+- **X-axis (k)**: Number of clusters. **Y-axis (Inertia)**: A measure of how "spread out" the points are within each cluster (lower = tighter groups).
+- As you increase k, inertia goes down because each point can be in a smaller, tighter group. The curve often bends like an **elbow**.
+- **Where to choose k**: Look for the "elbow" — the k where the curve starts to flatten. After that, adding more clusters doesn't help much. The **red line** shows the k you selected with the slider; try moving the slider to match the elbow if you're unsure.
+                """.strip())
             fig = px.line(
                 x=list(k_range), y=inertias, markers=True,
                 title="Elbow Method — Inertia vs k",
@@ -588,6 +598,19 @@ with tabs[3]:
         cdf["Cluster"] = [f"Cluster {l + 1}" for l in labels]
 
         with col_pca:
+            with st.expander("ℹ️ Help — PCA Projection"):
+                st.markdown("""
+**Why is this chart here?**  
+Clustering uses several features at once (rate, booking window, nights, channel, etc.). We can't draw that in 2D, so we use **PCA** to create a 2D "summary" view.
+
+**What is PCA (in plain terms)?**  
+PCA finds two new directions (PC1 and PC2) that capture as much of the variation in your data as possible. So this scatter plot is a **flattened picture** of your multi-dimensional data — each point is one booking, colored by its cluster.
+
+**How to use it:**
+- **Separate blobs of color** = clusters that are genuinely different in the full feature space.
+- **Overlapping blobs** = clusters that aren't very distinct; you might try a different k or different features.
+- **Hover** over a point to see its actual Booked Rate and WTP Score. The exact position on PC1/PC2 is less important than the overall grouping.
+                """.strip())
             pca = PCA(n_components=2)
             X_pca = pca.fit_transform(X_scaled)
             pca_df = pd.DataFrame({
